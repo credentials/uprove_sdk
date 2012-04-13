@@ -1,0 +1,7 @@
+// policy file for unit tests
+// Ant's junit integration calls System.setOut and writes temp files in the current dir
+
+grant {
+  permission java.lang.RuntimePermission "setIO";
+  permission java.io.FilePermission "${user.dir}${/}*", "read,write,delete";
+};

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="all" name="uprove">
+
+  <!-- read any custom properties -->
+  <!-- users should set the java.jar property to the full path to junit's .jar file -->
+  <property file="build.properties"/>
+
+  <!-- set global properties for this build -->
+  <property name="dir.src" location="src/main/java"/>
+  <property name="dir.javadoc" location="src/main/javadoc/"/>
+  <property name="dir.test" location="src/test/java"/>
+  <property name="dir.sample" location="src/sample/java"/>
+  <property name="dir.target" location="target"/>
+  <property name="dir.classes" location="${dir.target}/classes"/>
+  <property name="dir.test-classes" location="${dir.target}/test-classes"/>
+  <property name="dir.sample-classes" location="${dir.target}/sample-classes"/>
+  <property name="dir.apidocs" location="${dir.target}/apidocs"/>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${dir.target}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile all sources">
+    <mkdir dir="${dir.classes}"/>
+    <javac srcdir="${dir.src}" destdir="${dir.classes}" excludes="**/package.html" includeAntRuntime="false"/>
+    <mkdir dir="${dir.test-classes}"/>
+    <javac srcdir="${dir.test}" destdir="${dir.test-classes}" includeAntRuntime="false" classpath="${dir.classes};${junit.jar}"/>
+    <mkdir dir="${dir.sample-classes}"/>
+    <javac srcdir="${dir.sample}" destdir="${dir.sample-classes}" includeAntRuntime="false" classpath="${dir.classes}"/>
+  </target>
+
+  <target name="test" depends="compile"
+        description="runs the unit tests">
+    <junit fork="true" showoutput="true">
+      <jvmarg value="-Djava.security.policy=ant-junit.policy"/>
+      <formatter type="plain" usefile="false"/>
+      <classpath>
+        <pathelement path="${dir.classes}"/>
+        <pathelement path="${dir.test-classes}"/>
+        <pathelement path="${junit.jar}"/>
+      </classpath>
+      <batchtest>
+        <fileset dir="${dir.test-classes}" includes="**/*Test.class"/>
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="jar" depends="test"
+        description="generate a jar file for the SDK">
+    <jar jarfile="${dir.target}/${ant.project.name}.jar" basedir="${dir.classes}">
+      <manifest>
+        <attribute name="Implementation-Title" value="U-Prove Crypto SDK (Java Edition)"/>
+        <attribute name="Implementation-Version" value="1.1"/>
+        <attribute name="Implementation-Vendor" value="Microsoft Corporation"/>
+        <attribute name="Implementation-Vendor-Id" value="com.microsoft"/>
+        <attribute name="Implementation-URL" value="http://code.msdn.microsoft.com/uprovesdkjava"/>
+        <attribute name="Specification-Title" value="U-Prove Crypto SDK V1.1 (Java Edition)"/>
+        <attribute name="Specification-Version" value="1.1"/>
+        <attribute name="Specification-Vendor" value="Microsoft Corporation"/>
+        <attribute name="Sealed" value="true"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="apidocs"
+        description="generate api docs via javadoc">
+    <javadoc destdir="${dir.apidocs}"
+             overview="${dir.javadoc}/overview.html"
+             windowtitle="U-Prove Crypto SDK V1.1 (Java Edition)">
+      <sourcepath>
+        <pathelement path="${dir.src}"/>
+      </sourcepath>
+      <sourcefiles>
+        <fileset dir="${dir.sample}"/>
+      </sourcefiles>
+      <doctitle><![CDATA[U-Prove Crypto SDK V1.1 (Java Edition)]]></doctitle>
+      <footer><![CDATA[Copyright (C) Microsoft]]></footer>
+    </javadoc>
+  </target>
+
+  <target name="clean-apidocs"
+        description="cleans api docs">
+    <delete dir="${dir.apidocs}"/>
+  </target>
+
+  <target name="all" depends="jar,apidocs"/>
+
+  <target name="clean" depends="clean-apidocs"
+        description="clean up">
+    <delete dir="${dir.target}"/>
+  </target>
+
+</project>
