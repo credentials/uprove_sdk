@@ -98,7 +98,7 @@ final class ConfigImpl {
      * @return the default setting, or <code>null</code> if either none
      * is set or we don't have permission to read the requested property.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
 	private static String getDefault(final String propertyName) {
         try {
             // permission java.security.SecurityPermission
